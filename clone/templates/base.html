@@ -7,12 +7,26 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instagram</title>
+    {% if title %}
+    <title>Instagram - {{title}}</title>
+    {% else %}
+    <title> Instagram </title>
+    {% endif %}
+
+    {% block styles %}
+    {% bootstrap_css %}
+    <link rel="shortcut icon" href="{% static 'favicon.ico'%}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.11.2/css/all.css" />
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    {% endblock %}
+
 </head>
 
 <body>
     {% include "navbar.html" %}
+
+    {% block content %}
+    {%endblock%}
 
     {% block scripts %}
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
