@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.forms import ImageField
 
 # Create your models here.
 profile_photo = models.ImageField( default='profile/default.png')
@@ -15,8 +16,29 @@ class UserProfile(models.Model):
         return self.bio
 
     @classmethod
-    def search_by_user(cls,search_term):
-        instauser = cls.objects.filter(user__icontains=search_term)
-        return instauser
+    def search_user(cls,username):
+        return User.objects.filter(username = username)
 
 
+class Post(models.Model):
+    image = ImageField('image/')
+    name = models.CharField(max_length=144, blank=True, default="Post")
+    caption = models.TextField(blank=True)
+    created = models.DateTimeField(auto_now_add=True)
+    likes = models.IntegerField(default=0)
+    profile = models.ForeignKey(User, on_delete=models.CASCADE)
+    user_profile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+   
+    
+    def __str__(self):
+        return f"{self.name} - {self.caption}"
+
+    def save_post(self):
+        self.save()
+
+    def delete_post(self):
+        self.delete()
+
+    def update_caption(self, new_cap):
+        self.caption = new_cap
+        self.save()
