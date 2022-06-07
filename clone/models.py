@@ -42,3 +42,13 @@ class Post(models.Model):
     def update_caption(self, new_cap):
         self.caption = new_cap
         self.save()
+
+
+class Comment(models.Model):
+    comment = models.TextField()
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True, null=True)
+
+    def __str__(self):
+        return self.comment
