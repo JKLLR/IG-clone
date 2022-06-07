@@ -23,7 +23,7 @@ class UpdateUserForm(forms.ModelForm):
 class UpdateUserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
-        fields = ['name', 'location', 'profile_picture', 'bio']
+        fields = ['profile_photo', 'bio']
 
 
 class PostForm(forms.ModelForm):
