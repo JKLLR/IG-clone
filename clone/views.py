@@ -23,6 +23,21 @@ def register(request):
         form = RegisterForm()
     return render(request, 'registration/registration.html', {'form': form})
 
+def login(request):
+	if request.user.is_authenticated:
+		return redirect('insta')
+	else:
+		if request.method == 'POST':
+			username = request.POST.get('username')
+			password =request.POST.get('password')
 
-def signin(request):
-    pass
+			user = authenticate(request, username=username, password=password)
+
+			if user is not None:
+				login(request, user)
+				return redirect('/')
+			else:
+				messages.info(request, 'Username OR password is incorrect')
+
+		context = {}
+		return render(request, 'registration/login.html', context)
