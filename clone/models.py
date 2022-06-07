@@ -1,9 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.forms import ImageField
 
-# Create your models here.
-profile_photo = models.ImageField( default='profile/default.png')
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -21,7 +18,7 @@ class UserProfile(models.Model):
 
 
 class Post(models.Model):
-    image = ImageField('image/')
+    image= models.ImageField(upload_to = 'images/')
     name = models.CharField(max_length=144, blank=True, default="Post")
     caption = models.TextField(blank=True)
     created = models.DateTimeField(auto_now_add=True)

@@ -20,5 +20,4 @@ from clone import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('',include('clone.urls')),
-    path(r'register/',views.register,name='register'),
 ]
