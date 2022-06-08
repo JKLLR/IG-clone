@@ -9,33 +9,35 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Sign Up | Login</title>
     {%block styles%}
+    
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.0/examples/sign-in/">
     <link rel="stylesheet" href="{%static 'css/bootstrap.min.css'%}">
     <link rel="stylesheet" href="{%static 'css/all.min.css'%}">
     <link rel="stylesheet" href="{%static 'css/baguetteBox.min.css'%}">
-    <link rel="stylesheet" href="{%static 'css/auth.css'%}">
+    <link rel="stylesheet" href="{%static 'css/signin.css'%}">
     <link href="https://fonts.googleapis.com/css?family=Cookie|Lato&display=swap" rel="stylesheet">
     <link rel="icon" href="{%static 'favicon/favicon.png'%}" type="img/jpg">
+
+    <style>
+        .bd-placeholder-img {
+          font-size: 1.125rem;
+          text-anchor: middle;
+          -webkit-user-select: none;
+          -moz-user-select: none;
+          user-select: none;
+        }
+    
+        @media (min-width: 768px) {
+          .bd-placeholder-img-lg {
+            font-size: 3.5rem;
+          }
+        }
+      </style>
     {%endblock%}
     {{ profile_form.media }}
 </head>
 
 <body class="text-center">
-    <style>
-        .bd-placeholder-img {
-            font-size: 1.125rem;
-            text-anchor: middle;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-        }
-
-        @media (min-width: 768px) {
-            .bd-placeholder-img-lg {
-                font-size: 3.5rem;
-            }
-        }
-    </style>
     {%block content%}
     {%endblock%}
 
@@ -44,7 +46,7 @@
     <script src="{%static 'js/bootstrap.min.js'%}"></script>
     <script src="{%static 'js/all.min.js'%}"></script>
     <script src="{%static 'js/baguetteBox.min.js'%}"></script>
-    <script src="{%static 'js/main.js'%}"></script>
+    <script src="{%static 'js/script.js'%}"></script>
     {%endblock%}
 </body>
 
