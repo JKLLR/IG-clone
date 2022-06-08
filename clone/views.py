@@ -1,13 +1,13 @@
 from django.shortcuts import redirect, render
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
-from .forms import RegisterForm
+from django.contrib.auth.decorators import login_required
+from django.urls import reverse
+from .models import Post, User, UserProfile, Comment
+from .forms import CommentForm, PostForm, RegisterForm
 from django.contrib import messages
 
 # Create your views here.
-
-def home(request):
-    return render(request, 'home.html') 
 
 def register(request):
     if request.method == 'POST':
@@ -25,7 +25,7 @@ def register(request):
 
 def login(request):
 	if request.user.is_authenticated:
-		return redirect('insta')
+		return redirect('index')
 	else:
 		if request.method == 'POST':
 			username = request.POST.get('username')
@@ -41,3 +41,61 @@ def login(request):
 
 		context = {}
 		return render(request, 'registration/login.html', context)
+
+
+@login_required
+def index(request):
+    current_user = request.user
+    print(current_user)
+    current_profile = UserProfile.objects.get(user_id=current_user)
+    posts = Post.objects.all()[::-1]
+    comments = Comment.objects.all()
+
+    if request.method == "POST":
+        post_form = PostForm(request.POST, request.FILES)
+
+        if post_form.is_valid():
+            post = post_form.save(commit=False)
+
+            post.profile = current_user
+            post.user_profile = current_profile
+
+            post.save()
+            post_form = PostForm()
+            return HttpResponseRedirect(reverse("index"))
+
+    else:
+        post_form = PostForm()
+
+    return render(request, "instagram/index.html", context={"posts":posts,
+                                                           "current_user":current_user,
+                                                           "current_profile":current_profile,
+                                                           "post_form":post_form,
+                                                           "comments":comments})
+
+
+def post(request, id):
+    post = Post.objects.get(id = id)
+    comments = Comment.objects.filter(post__id=id)
+    current_user = request.user
+    current_profile = UserProfile.objects.get(post=id)
+
+    if request.method == "POST":
+        comment_form = CommentForm(request.POST)
+
+        if comment_form.is_valid():
+            comment = comment_form.save(commit=False)
+            comment.user = current_user
+            comment.post = post
+            comment.save()
+            comment_form = CommentForm()
+            return redirect("post", post.id)
+
+    else:
+        comment_form = CommentForm()
+
+    return render(request, "instagram/post.html", context={"post":post,
+                                                          "current_user":current_user,
+                                                          "current_profile":current_profile,
+                                                          "comment_form":comment_form,
+                                                          "comments":comments,})
