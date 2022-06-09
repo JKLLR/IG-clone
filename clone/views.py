@@ -1,19 +1,21 @@
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
-from .models import Post, User, UserProfile, Comment
-from .forms import CommentForm, PostForm, UserForm, UserProfileForm
+from .models import Post, UserProfile, Comment
+from django.contrib.auth.models import User
+from .forms import CommentForm, PostForm, SignUpForm, UserProfileForm
+from django.contrib import messages
 
-# Create your views here.
 
-@login_required
+@login_required(login_url='/accounts/login/')
 def index(request):
     current_user = request.user
     print(current_user)
-    current_profile = UserProfileForm.objects.get(user_id=current_user)
-    posts = Post.objects.all()[::-1]
+    current_profile = UserProfileForm.objects.get(user_id=current_user.id)
+    # current_profile=get_object_or_404(User,username=username)
+    posts = Post.objects.all()
     comments = Comment.objects.all()
 
     if request.method == "POST":
@@ -82,7 +84,7 @@ def like_post(request, id):
     return redirect("post", post.id)
 
 
-@login_required
+@login_required(login_url='/accounts/login/')
 def search(request):
     if 'profile' in request.GET and request.GET["profile"]:
         search_term = request.GET.get("profile")
@@ -103,72 +105,102 @@ def search(request):
  
     
 
-@login_required
+@login_required(login_url='/accounts/login/')
 def profile(request, id):
     user = User.objects.get(id=id)
     profile = UserProfile.objects.get(user_id=user)
-    posts = Post.objects.filter(profile__id=id)[::-1]
-    return render(request, "profile.html", context={"user":user,
-                                                             "profile":profile,
-                                                             "posts":posts})
+    posts = Post.objects.filter(profile__id=id)
+    return render(request, "profile.html", context={"user":user,"profile":profile,"posts":posts})
 
-def user_login(request):
+# def user_login(request):
     
+#     if request.method == "POST":
+#         username = request.POST.get("username")
+#         password = request.POST.get("password")
+
+#         user = authenticate(username=username, password=password)
+
+#         if user:
+
+#             if user.is_active:
+#                 login(request, user)
+
+#                 return HttpResponseRedirect(reverse("index"))
+#             else:
+#                 return HttpResponseRedirect(reverse("user_login")) #raise error/ flash
+
+#         else:
+#             return HttpResponseRedirect(reverse("user_login")) #raise error/ flash
+#     else:
+#         return render(request, "registration/login.html", context={})
+
+
+
+
+# def register(request):
+#     registered = False
+    
+
+#     if request.method == "POST":
+#         user_form = UserForm(request.POST)
+        
+#         if user_form.is_valid():
+#             user = user_form.save()
+#             user.set_password(user.password)
+#             user.save()
+
+#             user_profile = UserProfile()
+#             user_profile.user = user
+#             # user_profile.save()
+#             user_profile.save()
+#             registered = True
+            
+
+#             return HttpResponseRedirect(reverse("user_login"))
+
+#         else:
+#             pass
+
+#     else:
+#         user_form = UserForm()
+        
+
+#     return render(request, "registration/registration.html", context={"user_form":user_form,
+#                                                           "registered":registered})
+
+def login_page(request):
     if request.method == "POST":
-        username = request.POST.get("username")
-        password = request.POST.get("password")
-
-        user = authenticate(username=username, password=password)
-
-        if user:
-
-            if user.is_active:
-                login(request, user)
-
-                return HttpResponseRedirect(reverse("index"))
-            else:
-                return HttpResponseRedirect(reverse("user_login")) #raise error/ flash
-
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('index')
         else:
-            return HttpResponseRedirect(reverse("user_login")) #raise error/ flash
+            messages.success(request, ("There Was An Error Logging In, Try Again..."))
+            return redirect('login')
     else:
-        return render(request, "registration/login.html", context={})
+        return render(request, 'registration/login.html', {})
+
+def register(request):
+    if request.method == "POST":
+        form =SignUpForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password1']
+            user = authenticate(username=username, password=password)
+            login(request, user)
+            messages.success(request, ("Registration Successful!"))
+            return redirect('login')
+    else:
+        form = SignUpForm()
+    return render(request, 'registration/registration.html', {
+        'form':form,
+        })
 
 
-@login_required
+@login_required(login_url='/accounts/login/')
 def user_logout(request):
     logout(request)
     return HttpResponseRedirect(reverse("user_login"))
-
-
-def register(request):
-    registered = False
-    
-
-    if request.method == "POST":
-        user_form = UserForm(request.POST)
-        
-        if user_form.is_valid():
-            user = user_form.save()
-            user.set_password(user.password)
-            user.save()
-
-            user_profile = UserProfile()
-            user_profile.user = user
-            # user_profile.save()
-            user_profile.save()
-            registered = True
-            
-
-            return HttpResponseRedirect(reverse("user_login"))
-
-        else:
-            pass
-
-    else:
-        user_form = UserForm()
-        
-
-    return render(request, "registration/registration.html", context={"user_form":user_form,
-                                                          "registered":registered})
-

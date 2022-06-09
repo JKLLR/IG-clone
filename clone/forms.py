@@ -2,23 +2,29 @@ from django import forms
 from django.contrib.auth.models import User
 from .models import UserProfile, Post, Comment
 from cloudinary.models import CloudinaryField
+from django.contrib.auth.forms import UserCreationForm
 
-
-class UserForm(forms.ModelForm):
-    first_name = forms.CharField(label=False, widget=forms.TextInput(attrs={"class":"form-control mb-3",
-                                                               "placeholder":"First Name"}))
-    last_name = forms.CharField(label=False, widget=forms.TextInput(attrs={"class":"form-control mb-3",
-                                                               "placeholder":"Last Name"}))
-    username = forms.CharField(label=False, widget=forms.TextInput(attrs={"class":"form-control mb-3",
-                                                               "placeholder":"Username"}))
-    email = forms.CharField(label=False, widget=forms.TextInput(attrs={"class":"form-control mb-3",
-                                                               "placeholder":"Email"}))
-    password = forms.CharField(label=False, widget=forms.PasswordInput(attrs={"class":"form-control mb-3",
-                                                               "placeholder":"Password"}))
-
+class SignUpForm(UserCreationForm):
+    email=forms.EmailField(max_length=254,help_text='Required.inform a valid email address')
     class Meta:
-        model = User
-        fields = ("first_name", "last_name", "username", "email", "password",)
+        model=User
+        fields=('username','email','password1','password2')
+
+# class UserForm(forms.ModelForm):
+#     first_name = forms.CharField(label=False, widget=forms.TextInput(attrs={"class":"form-control mb-3",
+#                                                                "placeholder":"First Name"}))
+#     last_name = forms.CharField(label=False, widget=forms.TextInput(attrs={"class":"form-control mb-3",
+#                                                                "placeholder":"Last Name"}))
+#     username = forms.CharField(label=False, widget=forms.TextInput(attrs={"class":"form-control mb-3",
+#                                                                "placeholder":"Username"}))
+#     email = forms.CharField(label=False, widget=forms.TextInput(attrs={"class":"form-control mb-3",
+#                                                                "placeholder":"Email"}))
+#     password = forms.CharField(label=False, widget=forms.PasswordInput(attrs={"class":"form-control mb-3",
+#                                                                "placeholder":"Password"}))
+
+#     class Meta:
+#         model = User
+#         fields = ("first_name", "last_name", "username", "email", "password",)
 
     
 

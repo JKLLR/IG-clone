@@ -36,14 +36,16 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'clone.apps.CloneConfig',
-    'bootstrap5',
+    'bootstrap4',
+    'cloudinary',
+    'crispy_forms',
+    'django_registration',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'cloudinary',
 ]
 
 cloudinary.config( 
@@ -51,6 +53,8 @@ cloudinary.config(
   api_key = "899794324973136", 
   api_secret = "a5aNCEo4affViIODCc7sAsuNHm4" 
 )
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -139,3 +143,8 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Login
+LOGIN_URL = '/login'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/accounts/register'
