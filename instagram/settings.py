@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 
 import os
+import cloudinary
 from pathlib import Path
 from decouple import config
 
@@ -42,7 +43,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'cloudinary',
 ]
+
+cloudinary.config( 
+  cloud_name = "dnrny9lzh", 
+  api_key = "899794324973136", 
+  api_secret = "a5aNCEo4affViIODCc7sAsuNHm4" 
+)
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

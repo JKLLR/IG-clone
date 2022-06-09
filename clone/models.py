@@ -1,10 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import User
-
+from cloudinary.models import CloudinaryField
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    profile_photo = models.ImageField( default='profile/default.png')
+    profile_photo = CloudinaryField('profile_pic')
     bio = models.TextField(blank=True)
     followers = models.ManyToManyField(User, related_name="followers", blank=True)
     following = models.ManyToManyField(User, related_name="following", blank=True)
@@ -18,7 +18,7 @@ class UserProfile(models.Model):
 
 
 class Post(models.Model):
-    image= models.ImageField(upload_to = 'images/')
+    image= CloudinaryField('image')
     name = models.CharField(max_length=144, blank=True, default="Post")
     caption = models.TextField(blank=True)
     created = models.DateTimeField(auto_now_add=True)

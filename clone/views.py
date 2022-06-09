@@ -4,50 +4,14 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from .models import Post, User, UserProfile, Comment
-from .forms import CommentForm, PostForm, RegisterForm
-from django.contrib import messages
+from .forms import CommentForm, PostForm, UserForm, UserProfileForm
 
-# Create your views here.
-
-def register(request):
-    if request.method == 'POST':
-        form = RegisterForm(request.POST)
-        if form.is_valid():
-            form.save()
-            username = form.cleaned_data.get('username')
-            f_password = form.cleaned_data.get('password1')
-            user = authenticate(username=username, password=f_password)
-            messages.success(request, 'Account was created for ' + user)
-            return redirect('home')
-    else:
-        form = RegisterForm()
-    return render(request, 'registration/registration.html', {'form': form})
-
-def login(request):
-	if request.user.is_authenticated:
-		return redirect('index')
-	else:
-		if request.method == 'POST':
-			username = request.POST.get('username')
-			password =request.POST.get('password')
-
-			user = authenticate(request, username=username, password=password)
-
-			if user is not None:
-				login(request, user)
-				return redirect('/')
-			else:
-				messages.info(request, 'Username OR password is incorrect')
-
-		context = {}
-		return render(request, 'registration/login.html', context)
-
-
+# Create your views here
 @login_required
 def index(request):
     current_user = request.user
     print(current_user)
-    current_profile = UserProfile.objects.get(user_id=current_user)
+    current_profile = UserProfileForm.objects.get(user_id=current_user)
     posts = Post.objects.all()[::-1]
     comments = Comment.objects.all()
 
@@ -67,7 +31,9 @@ def index(request):
     else:
         post_form = PostForm()
 
-    return render(request, "instagram/index.html", context={"posts":posts,
+    
+
+    return render(request, "index.html", context={"posts":posts,
                                                            "current_user":current_user,
                                                            "current_profile":current_profile,
                                                            "post_form":post_form,
@@ -94,8 +60,80 @@ def post(request, id):
     else:
         comment_form = CommentForm()
 
-    return render(request, "instagram/post.html", context={"post":post,
+    return render(request, "post.html", context={"post":post,
                                                           "current_user":current_user,
                                                           "current_profile":current_profile,
                                                           "comment_form":comment_form,
                                                           "comments":comments,})
+
+
+def like(request, id):
+    post = Post.objects.get(id = id)
+    post.likes += 1
+    post.save()
+    return HttpResponseRedirect(reverse("index"))
+
+
+def like_post(request, id):
+    post = Post.objects.get(id = id)
+    post.likes += 1
+    post.save()
+    return redirect("post", post.id)
+
+
+
+def user_login(request):
+    
+    if request.method == "POST":
+        username = request.POST.get("username")
+        password = request.POST.get("password")
+
+        user = authenticate(username=username, password=password)
+
+        if user:
+
+            if user.is_active:
+                login(request, user)
+
+                return HttpResponseRedirect(reverse("index"))
+            else:
+                return HttpResponseRedirect(reverse("user_login")) #raise error/ flash
+
+        else:
+            return HttpResponseRedirect(reverse("user_login")) #raise error/ flash
+    else:
+        return render(request, "registration/login.html", context={})
+
+
+
+def register(request):
+    registered = False
+    
+
+    if request.method == "POST":
+        user_form = UserForm(request.POST)
+        
+        if user_form.is_valid():
+            user = user_form.save()
+            user.set_password(user.password)
+            user.save()
+
+            user_profile = UserProfile()
+            user_profile.user = user
+            # user_profile.save()
+            user_profile.save()
+            registered = True
+            
+
+            return HttpResponseRedirect(reverse("user_login"))
+
+        else:
+            pass
+
+    else:
+        user_form = UserForm()
+        
+
+    return render(request, "registration/registration.html", context={"user_form":user_form,
+                                                          "registered":registered})
+

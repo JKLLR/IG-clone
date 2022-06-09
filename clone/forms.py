@@ -1,43 +1,50 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import UserProfile, Post, Comment
+from cloudinary.models import CloudinaryField
 
 
-class RegisterForm(UserCreationForm):
-    email = forms.EmailField(max_length=200, help_text='Required. Inform a valid email address.')
+class UserForm(forms.ModelForm):
+    first_name = forms.CharField(label=False, widget=forms.TextInput(attrs={"class":"form-control mb-3",
+                                                               "placeholder":"First Name"}))
+    last_name = forms.CharField(label=False, widget=forms.TextInput(attrs={"class":"form-control mb-3",
+                                                               "placeholder":"Last Name"}))
+    username = forms.CharField(label=False, widget=forms.TextInput(attrs={"class":"form-control mb-3",
+                                                               "placeholder":"Username"}))
+    email = forms.CharField(label=False, widget=forms.TextInput(attrs={"class":"form-control mb-3",
+                                                               "placeholder":"Email"}))
+    password = forms.CharField(label=False, widget=forms.PasswordInput(attrs={"class":"form-control mb-3",
+                                                               "placeholder":"Password"}))
 
     class Meta:
         model = User
-        fields = ('username', 'email', 'password1', 'password2')
+        fields = ("first_name", "last_name", "username", "email", "password",)
+
+    
 
 
-class UpdateUserForm(forms.ModelForm):
-    email = forms.EmailField(max_length=200, help_text='Required. Inform a valid email address.')
-
-    class Meta:
-        model = User
-        fields = ('username', 'email')
-
-
-class UpdateUserProfileForm(forms.ModelForm):
+class UserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
-        fields = ['profile_photo', 'bio']
+        fields = ("profile_photo",)
+
 
 
 class PostForm(forms.ModelForm):
+    caption = forms.CharField(widget=forms.Textarea(attrs={"class":"form-control",
+                                                           "placeholder":"Caption...",
+                                                           "rows":"4"}))
+    image = CloudinaryField('image')
+
     class Meta:
         model = Post
-        fields = ('image', 'caption')
+        fields = ("caption", "image",)
 
 
 class CommentForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['comment'].widget = forms.TextInput()
-        self.fields['comment'].widget.attrs['placeholder'] = 'comment...'
+    comment = forms.CharField(label=False, widget=forms.TextInput(attrs={"class":"form-control comment",
+                                                                         "placeholder":"Add a comment..."}))
 
     class Meta:
         model = Comment
-        fields = ('comment',) 
+        fields = ("comment",) 
