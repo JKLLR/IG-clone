@@ -6,7 +6,8 @@ from django.urls import reverse
 from .models import Post, User, UserProfile, Comment
 from .forms import CommentForm, PostForm, UserForm, UserProfileForm
 
-# Create your views here
+# Create your views here.
+
 @login_required
 def index(request):
     current_user = request.user
@@ -81,6 +82,35 @@ def like_post(request, id):
     return redirect("post", post.id)
 
 
+@login_required
+def search(request):
+    if 'profile' in request.GET and request.GET["profile"]:
+        search_term = request.GET.get("profile")
+        searched_user = UserProfile.search_by_user(search_term)
+        message = f"{search_term}"
+        user = User.objects.all()
+        context = {
+            "user":user,
+            "message":message,
+            "profile":searched_user
+        }
+        return render(request,'search_results.html',context)
+
+    else:
+        message = "You haven't searched for any term"
+        return render(request, 'search_results.html',{"message":message})
+
+ 
+    
+
+@login_required
+def profile(request, id):
+    user = User.objects.get(id=id)
+    profile = UserProfile.objects.get(user_id=user)
+    posts = Post.objects.filter(profile__id=id)[::-1]
+    return render(request, "profile.html", context={"user":user,
+                                                             "profile":profile,
+                                                             "posts":posts})
 
 def user_login(request):
     
@@ -104,6 +134,11 @@ def user_login(request):
     else:
         return render(request, "registration/login.html", context={})
 
+
+@login_required
+def user_logout(request):
+    logout(request)
+    return HttpResponseRedirect(reverse("user_login"))
 
 
 def register(request):
