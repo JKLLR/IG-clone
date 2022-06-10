@@ -1,38 +1,102 @@
-<div class="top">
-    <div class="top-items">
-        <div class="logo-area">
-            <a href="#"><img
-                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Instagram_logo.svg/1200px-Instagram_logo.svg.png"
-                    alt="logo" width="103">
-        </div></a>
-    </div>
+<div class="container">
+    <nav class="navbar navbar-light bg-light" id="nav">
+        <div class="container">
+            <a href="{% url 'post' %}">
+                <img src="https://www.instagram.com/static/images/web/mobile_nav_type_logo.png/735145cfe0a4.png" alt=""></a>
+            {% if user.is_authenticated %}
 
-    <div class="search-box sb">
-        <input type="text" class="search" placeholder="search">
-        <span class="ic"><img src="https://cdn2.iconfinder.com/data/icons/font-awesome/1792/search-512.png" alt="search"
-                height="10px"></span>
-    </div>
+            <form class="mb-0 h1 ml-auto mr-auto input-group w-auto" action="{% url 'search_results' %}">
+                <input type="search" class="form-control rounded" placeholder="Search" aria-label="Search"
+                    aria-describedby="search-addon" name="profile" />
+                <span class="input-group-text border-0" id="search-addon">
+                    <i class="fas fa-search"></i>
+                </span>
+            </form>
 
-    <div class="acct-actions">
-
-        <div class="actions">
-            <a href="#" class="li">
-                <img height="24px" src="https://static.thenounproject.com/png/17705-200.png" alt="explore">
-            </a>
-            <a href="#" class="li">
-                <img height="24px" src="https://cdn.iconscout.com/icon/free/png-512/explore-1781524-1513844.png"
-                    alt="explore">
-            </a>
-            <a href="#" class="li">
-                <img height="24px"
-                    src="https://www.pinclipart.com/picdir/big/33-337369_heart-shaped-clipart-instagram-heart-sign-icon-transparent.png"
-                    alt="love">
+            <div class="icons">
+ 
+                <!-- Home starts  -->
+                <a href="{% url 'post' %}">
+                <div class="home">
+                    <svg aria-label="Home" class="_8-yf5 " color="#262626" fill="#262626" height="22" role="img"
+                        viewBox="0 0 48 48" width="22">
+                        <path id="home1"
+                            d="M45.5 48H30.1c-.8 0-1.5-.7-1.5-1.5V34.2c0-2.6-2.1-4.6-4.6-4.6s-4.6 2.1-4.6 4.6v12.3c0 .8-.7 1.5-1.5 1.5H2.5c-.8 0-1.5-.7-1.5-1.5V23c0-.4.2-.8.4-1.1L22.9.4c.6-.6 1.6-.6 2.1 0l21.5 21.5c.3.3.4.7.4 1.1v23.5c.1.8-.6 1.5-1.4 1.5z">
+                        </path>
+                    </svg>
+                </div>
             </a>
 
-            <a href="#" class="li">
-                <img height="24px" src="https://pbs.twimg.com/profile_images/1017823687804882944/YMzUeY9d_400x400.jpg"
-                    alt="user" style="border-radius: 50%">
-            </a>
+                <!-- Home ends  -->
+
+
+                <div class="create">
+
+                    <svg aria-label="New Post" class="_8-yf5 " color="#262626" fill="#262626" height="22" role="img" data-target="#imageUpload"
+                        viewBox="0 0 48 48" width="22">
+                        <path
+                            d="M31.8 48H16.2c-6.6 0-9.6-1.6-12.1-4C1.6 41.4 0 38.4 0 31.8V16.2C0 9.6 1.6 6.6 4 4.1 6.6 1.6 9.6 0 16.2 0h15.6c6.6 0 9.6 1.6 12.1 4C46.4 6.6 48 9.6 48 16.2v15.6c0 6.6-1.6 9.6-4 12.1-2.6 2.5-5.6 4.1-12.2 4.1zM16.2 3C10 3 7.8 4.6 6.1 6.2 4.6 7.8 3 10 3 16.2v15.6c0 6.2 1.6 8.4 3.2 10.1 1.6 1.6 3.8 3.1 10 3.1h15.6c6.2 0 8.4-1.6 10.1-3.2 1.6-1.6 3.1-3.8 3.1-10V16.2c0-6.2-1.6-8.4-3.2-10.1C40.2 4.6 38 3 31.8 3H16.2z">
+                        </path>
+                        <path
+                            d="M36.3 25.5H11.7c-.8 0-1.5-.7-1.5-1.5s.7-1.5 1.5-1.5h24.6c.8 0 1.5.7 1.5 1.5s-.7 1.5-1.5 1.5z">
+                        </path>
+                        <path
+                            d="M24 37.8c-.8 0-1.5-.7-1.5-1.5V11.7c0-.8.7-1.5 1.5-1.5s1.5.7 1.5 1.5v24.6c0 .8-.7 1.5-1.5 1.5z">
+                        </path>
+                    </svg>
+                </div>
+                <!-- create ends  -->
+
+                <!-- Profile image starts  -->
+                <div class="profile-img">
+                    <!-- Profile icon start  -->
+                    <div> <span style="width:22px;height:22px; border: 1px solid #fafafa;">
+                            <img style="width:22px;height:22px;border-radius: 100%;" src="/static/images/d.png" alt="">
+                        </span>
+                    </div>
+                    <!-- Profile icons ends  -->
+
+                    <!-- Drop down menu starts  -->
+                    <div class="drop-down">
+                        <!-- pointer for drop down  -->
+                        <div class="square" style="
+                            width: 15px;
+                            height: 15px;
+                            background-color: #ffffff;
+                            position: absolute;
+                            top: -8px;
+                            right: 18px;
+                            z-index: 0;
+                            transform: rotateZ(45deg);
+                            box-shadow:-5px -5px 5px 0px rgb(0 0 0 / 10%);">
+                        </div>
+                        <!-- pointer ends  -->
+
+                        <ul>
+                            <!-- 1 item start  -->
+                            <li>
+                                <svg aria-label="Profile" class="_8-yf5 " color="#262626" fill="#262626" height="16"
+                                    role="img" viewBox="0 0 32 32" width="16">
+                                    <path
+                                        d="M16 0C7.2 0 0 7.1 0 16c0 4.8 2.1 9.1 5.5 12l.3.3C8.5 30.6 12.1 32 16 32s7.5-1.4 10.2-3.7l.3-.3c3.4-3 5.5-7.2 5.5-12 0-8.9-7.2-16-16-16zm0 29c-2.8 0-5.3-.9-7.5-2.4.5-.9.9-1.3 1.4-1.8.7-.5 1.5-.8 2.4-.8h7.2c.9 0 1.7.3 2.4.8.5.4.9.8 1.4 1.8-2 1.5-4.5 2.4-7.3 2.4zm9.7-4.4c-.5-.9-1.1-1.5-1.9-2.1-1.2-.9-2.7-1.4-4.2-1.4h-7.2c-1.5 0-3 .5-4.2 1.4-.8.6-1.4 1.2-1.9 2.1C4.2 22.3 3 19.3 3 16 3 8.8 8.8 3 16 3s13 5.8 13 13c0 3.3-1.2 6.3-3.3 8.6zM16 5.7c-3.9 0-7 3.1-7 7s3.1 7 7 7 7-3.1 7-7-3.1-7-7-7zm0 11c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4z">
+                                    </path>
+                                </svg>
+                                <a href="{% url 'profile' %}">Profile</a>
+                                
+                            </li>
+                            <!-- 1 ends  -->
+                            <!-- 5 item starts  -->
+                            <li style="border-top:2px solid #dbdbdb;"><a href="{% url 'logout' %}">Log Out</a>
+                            </li>
+                            <!-- 5 ends  -->
+                        </ul>
+                    </div><!-- Drop down menu ends  -->
+
+                </div> <!-- Profile image ends  -->
+            </div><!-- Icons container ends here  -->
+            {% endif %}
+
+
         </div>
-    </div>
+    </nav>
 </div>

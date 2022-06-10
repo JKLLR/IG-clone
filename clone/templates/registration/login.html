@@ -2,11 +2,11 @@
 {% load crispy_forms_tags %}
 {% block content %}
 {% load static %}
-<div class="form-signin" style="margin-top: 100;" method="POST">
+<div class="form-signin" style="margin-top: 100; " method="POST">
   <form action="" method="post" novalidate>
     {% csrf_token%}
     {{ form|crispy}}
-    <h1 class="mb-4 text-white"><span id="insta" style="padding-bottom: 20px;">Instagram</span></h1>
+    <h1 class="mb-4"><span id="insta" style="padding-bottom: 20px;">Instagram</span></h1>
     <div class="mb-3">
       <label for="exampleInputEmail1" class="form-label">Username</label>
       <input type="text" class="form-control" name="username" aria-describedby="emailHelp">
@@ -17,15 +17,12 @@
     </div>
     <button type="submit" class="btn btn-primary btn-sm D-block mx-auto"> Log In</button>
   </form>
-</div>
-<a href="" class="D-block mx-auto mb-3">Forgot password? </a>
-<div class="card mt-2">
-  <div class="card-body mt-3 mb-3 mr-2 ml-4">
-    Don't have an account? <a href="{% url 'register' %}">Sign up</a>
+  <a href="" class="D-block mx-auto mb-3">Forgot password? </a>
+  <div class="card mt-2">
+    <div class="card-body mt-3 mb-3 mr-2 ml-4">
+      Don't have an account? <a href="{% url 'register' %}">Sign up</a>
+    </div>
   </div>
+  <div class="col-md-2"></div>
 </div>
-<div class="col-md-2"></div>
-{% endblock %}
-
-
-   
+  {% endblock %}

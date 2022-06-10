@@ -1,8 +1,9 @@
 from django import forms
-from django.contrib.auth.models import User
-from .models import UserProfile, Post, Comment
-from cloudinary.models import CloudinaryField
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
+from .models import Profile,Post,Comment
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Submit
 
 class SignUpForm(UserCreationForm):
     email=forms.EmailField(max_length=254,help_text='Required.inform a valid email address')
@@ -10,47 +11,40 @@ class SignUpForm(UserCreationForm):
         model=User
         fields=('username','email','password1','password2')
 
-# class UserForm(forms.ModelForm):
-#     first_name = forms.CharField(label=False, widget=forms.TextInput(attrs={"class":"form-control mb-3",
-#                                                                "placeholder":"First Name"}))
-#     last_name = forms.CharField(label=False, widget=forms.TextInput(attrs={"class":"form-control mb-3",
-#                                                                "placeholder":"Last Name"}))
-#     username = forms.CharField(label=False, widget=forms.TextInput(attrs={"class":"form-control mb-3",
-#                                                                "placeholder":"Username"}))
-#     email = forms.CharField(label=False, widget=forms.TextInput(attrs={"class":"form-control mb-3",
-#                                                                "placeholder":"Email"}))
-#     password = forms.CharField(label=False, widget=forms.PasswordInput(attrs={"class":"form-control mb-3",
-#                                                                "placeholder":"Password"}))
 
-#     class Meta:
-#         model = User
-#         fields = ("first_name", "last_name", "username", "email", "password",)
-
-    
-
-
-class UserProfileForm(forms.ModelForm):
+class UpdateUserForm(forms.ModelForm):
+    email=forms.EmailField(max_length=254,help_text='Required.inform a valid email address')
     class Meta:
-        model = UserProfile
-        fields = ("profile_photo",)
+        model=User
+        fields=('username','email')
 
-
-
+class UpdateUserProfileForm(forms.ModelForm):
+    class Meta:
+        model=Profile
+        fields=('name','profile_pic','bio','location')
 class PostForm(forms.ModelForm):
-    caption = forms.CharField(widget=forms.Textarea(attrs={"class":"form-control",
-                                                           "placeholder":"Caption...",
-                                                           "rows":"4"}))
-    image = CloudinaryField('image')
-
     class Meta:
         model = Post
-        fields = ("caption", "image",)
+        fields = ('image_post', 'caption')
 
+# class CommentForm(forms.ModelForm):
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(*args, **kwargs)
+#         self.fields['comment'].widget = forms.TextInput()
+#         self.fields['comment'].widget.attrs['placeholder'] = 'Add a comment...'
+
+#     class Meta:
+#         model = Comment
+#         fields = ('comment',)
 
 class CommentForm(forms.ModelForm):
-    comment = forms.CharField(label=False, widget=forms.TextInput(attrs={"class":"form-control comment",
-                                                                         "placeholder":"Add a comment..."}))
+    helper = FormHelper()
+    helper.form_method = 'POST'
+    helper.add_input(Submit('Comment','Comment',css_class = 'btn-success  m-2 btn-sm'))
 
     class Meta:
         model = Comment
-        fields = ("comment",) 
+        fields = [
+            'comment',
+            
+    ]   

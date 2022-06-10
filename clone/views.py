@@ -1,173 +1,27 @@
-from django.shortcuts import  redirect, render
-from django.http import HttpResponse, HttpResponseRedirect
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
-from django.urls import reverse
-from .models import Post, UserProfile, Comment
-from django.contrib.auth.models import User
-from .forms import CommentForm, PostForm, SignUpForm, UserProfileForm
+from datetime import datetime
+from django.shortcuts import  get_object_or_404, redirect, render
+from django.http import HttpResponse, Http404,HttpResponseRedirect
 from django.contrib import messages
-from .filters import UserFilter
+from .forms import SignUpForm,UpdateUserForm, UpdateUserProfileForm,PostForm,CommentForm
+from .models import Profile, Post, User, Subscribers, Follow, Comment, Like
+from django.contrib.auth import authenticate, login, logout
+from .models import *
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
 
-
-@login_required(login_url='/accounts/login/')
-def index(request):
-    current_user = request.user
-    print(current_user)
-    current_profile = UserProfile.objects.get(user_id=current_user)
-    # current_profile=get_object_or_404(User,username=username)
-    posts = Post.objects.all()
-    comments = Comment.objects.all()
-
-    if request.method == "POST":
-        post_form = PostForm(request.POST, request.FILES)
-
-        if post_form.is_valid():
-            post = post_form.save(commit=False)
-
-            post.profile = current_user
-            post.user_profile = current_profile
-
-            post.save()
-            post_form = PostForm()
-            return HttpResponseRedirect(reverse("index"))
-
-    else:
-        post_form = PostForm()
-
-    
-
-    return render(request, "index.html", context={"posts":posts,
-                                                           "current_user":current_user,
-                                                           "current_profile":current_profile,
-                                                           "post_form":post_form,
-                                                           "comments":comments})
-
-
-def post(request, id):
-    post = Post.objects.get(id = id)
-    comments = Comment.objects.filter(post__id=id)
-    current_user = request.user
-    current_profile = UserProfile.objects.get(post=id)
-
-    if request.method == "POST":
-        comment_form = CommentForm(request.POST)
-
-        if comment_form.is_valid():
-            comment = comment_form.save(commit=False)
-            comment.user = current_user
-            comment.post = post
-            comment.save()
-            comment_form = CommentForm()
-            return redirect("post", post.id)
-
-    else:
-        comment_form = CommentForm()
-
-    return render(request, "post.html", context={"post":post,
-                                                          "current_user":current_user,
-                                                          "current_profile":current_profile,
-                                                          "comment_form":comment_form,
-                                                          "comments":comments,})
-
-
-def like(request, id):
-    post = Post.objects.get(id = id)
-    post.likes += 1
-    post.save()
-    return HttpResponseRedirect(reverse("index"))
-
-
-def like_post(request, id):
-    post = Post.objects.get(id = id)
-    post.likes += 1
-    post.save()
-    return redirect("post", post.id)
-
-
-@login_required(login_url='/accounts/login/')
-def search(request):
-    if 'profile' in request.GET and request.GET["profile"]:
-        search_term = request.GET.get("profile")
-        searched_user = UserProfile.search_by_user(search_term)
-        message = f"{search_term}"
-        user = User.objects.all()
-        context = {
-            "user":user,
-            "message":message,
-            "profile":searched_user
-        }
-        return render(request,'search_results.html',context)
-
-    else:
-        message = "You haven't searched for any term"
-        return render(request, 'search_results.html',{"message":message})
-
- 
-    
-
-@login_required(login_url='/accounts/login/')
-def profile(request, id):
-    user = User.objects.get(id=id)
-    profile = UserProfile.objects.get(user_id=user)
-    posts = Post.objects.filter(profile__id=id)
-    return render(request, "profile.html", context={"user":user,"profile":profile,"posts":posts})
-
-# def user_login(request):
-    
-#     if request.method == "POST":
-#         username = request.POST.get("username")
-#         password = request.POST.get("password")
-
-#         user = authenticate(username=username, password=password)
-
-#         if user:
-
-#             if user.is_active:
-#                 login(request, user)
-
-#                 return HttpResponseRedirect(reverse("index"))
-#             else:
-#                 return HttpResponseRedirect(reverse("user_login")) #raise error/ flash
-
-#         else:
-#             return HttpResponseRedirect(reverse("user_login")) #raise error/ flash
-#     else:
-#         return render(request, "registration/login.html", context={})
+from django.contrib import messages
 
 
 
 
-# def register(request):
-#     registered = False
-    
+def welcome(request):
+    return render(request,'index.html')
 
-#     if request.method == "POST":
-#         user_form = UserForm(request.POST)
-        
-#         if user_form.is_valid():
-#             user = user_form.save()
-#             user.set_password(user.password)
-#             user.save()
 
-#             user_profile = UserProfile()
-#             user_profile.user = user
-#             # user_profile.save()
-#             user_profile.save()
-#             registered = True
-            
+def logoutUser(request):
+	logout(request)
+	return redirect('login')
 
-#             return HttpResponseRedirect(reverse("user_login"))
-
-#         else:
-#             pass
-
-#     else:
-#         user_form = UserForm()
-        
-
-#     return render(request, "registration/registration.html", context={"user_form":user_form,
-#                                                           "registered":registered})
 
 def login_page(request):
     if request.method == "POST":
@@ -176,7 +30,7 @@ def login_page(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return redirect('index')
+            return redirect('post')
         else:
             messages.success(request, ("There Was An Error Logging In, Try Again..."))
             return redirect('login')
@@ -201,7 +55,122 @@ def register(request):
         })
 
 
-@login_required(login_url='/accounts/login/')
-def user_logout(request):
-    logout(request)
-    return HttpResponseRedirect(reverse("user_login"))
+
+@login_required(login_url='login')
+def profile(request):
+    # images = request.user.profile.posts.all()
+    images = Post.objects.all()  
+    print(images)
+    if request.method == 'POST':
+        user_form = UpdateUserForm(request.POST, instance=request.user)
+        prof_form = UpdateUserProfileForm(request.POST, request.FILES, instance=request.user.profile)
+        if user_form.is_valid() and prof_form.is_valid():
+            user_form.save()
+            prof_form.save()
+            return HttpResponseRedirect(request.path_info)
+    else:
+        user_form = UpdateUserForm(instance=request.user)
+        prof_form = UpdateUserProfileForm(instance=request.user.profile)
+    contex = {
+        'user_form': user_form,
+        'prof_form': prof_form,
+        'images': images,
+
+    }
+    return render(request, 'accounts_pages/profile.html', contex)
+
+@login_required(login_url='login')
+def user_profile(request,username):
+    profile_user=get_object_or_404(User,username=username)
+    if request.user == profile_user:
+        return redirect('profile',username=request.user.username)
+    user_posts=profile_user.profile.posts.all()
+
+    followers=Follow.objects.filter(followed=profile_user.profile)  
+    following=None
+    for follower in followers:
+        if request.user.profile == follower.follower:
+            following=True  
+        else:
+            following=False
+    context = {
+        'profile_user':profile_user,
+        'user_posts':user_posts,
+        'followers':followers,
+        'following':following
+        }
+    return render(request, 'accounts_pages/user_profile.html', context)
+            
+@login_required(login_url='login')
+def post(request):
+    images = Post.objects.all()
+    print(images)
+    comments = Comment.objects.all()
+    users = User.objects.exclude(id=request.user.id)
+    if request.method == "POST":
+        form = PostForm(request.POST, request.FILES)
+        if form.is_valid():
+            image = form.save(commit = False)
+            image.user = request.user.profile
+            image.save()
+            messages.success(request, f'Successfully uploaded your pic!')
+            return redirect('post')
+    else:
+        form = PostForm()
+    return render(request, 'index.html', {"images":images[::-1], "form": form, "users": users, "comments": comments })
+
+
+def image(request,image_id):
+    try:
+        image = Post.objects.get(id = image_id)
+    except ObjectDoesNotExist:
+        raise Http404()
+    return render(request,"image.html", {"image":image})
+
+def new_comment(request,pk):
+    post = Post.objects.get(pk = pk)
+    comments = Comment.objects.all()
+    if request.method == 'POST':
+
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            # name = request.user.username
+            comment= form.cleaned_data['comment']
+            obj = Comment(post = post,comment = comment,date = datetime.now())
+            obj.save()
+            print('object',obj)
+        return redirect('post')
+    else:
+        form = CommentForm()
+        print(form)
+
+    return render(request, 'accounts_pages/comment.html', {"form": form,"comments":comments})
+    
+@login_required
+def search_results(request):
+    if 'profile' in request.GET and request.GET["profile"]:
+        search_term = request.GET.get("profile")
+        searched_profiles = Profile.search_profile(search_term)
+        message = f"{search_term}"
+        return render(request, 'accounts_pages/search.html', {"message":message,"profiles": searched_profiles})
+    else:
+        message = "You haven't searched for any profile"
+    return render(request, 'accounts_pages/search.html', {'message': message})
+
+
+def like(request,image_id):
+    user = request.user
+    post = Post.objects.get(id = image_id)
+    current_likes = post.likes
+    liked = Like.objects.filter(user = user,post = post).count()
+    if not liked:
+        Like.objects.create(user = user,post = post)
+        current_likes = current_likes + 1
+    else:
+        Like.objects.filter(user = user,post = post).delete()  
+        current_likes = current_likes - 1
+
+    post.likes = current_likes
+    post.save()
+
+    return redirect('post')
