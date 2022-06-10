@@ -1,4 +1,4 @@
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import  redirect, render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -7,13 +7,14 @@ from .models import Post, UserProfile, Comment
 from django.contrib.auth.models import User
 from .forms import CommentForm, PostForm, SignUpForm, UserProfileForm
 from django.contrib import messages
+from .filters import UserFilter
 
 
 @login_required(login_url='/accounts/login/')
 def index(request):
     current_user = request.user
     print(current_user)
-    current_profile = UserProfileForm.objects.get(user_id=current_user.id)
+    current_profile = UserProfile.objects.get(user_id=current_user)
     # current_profile=get_object_or_404(User,username=username)
     posts = Post.objects.all()
     comments = Comment.objects.all()
