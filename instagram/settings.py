@@ -57,6 +57,8 @@ cloudinary.config(
   api_secret = "a5aNCEo4affViIODCc7sAsuNHm4" 
 )
 
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 MIDDLEWARE = [
